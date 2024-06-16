@@ -42,9 +42,11 @@ class HomeScreen extends StatelessWidget {
                         THomeCategory()
                       ],
                     ),
-                  )
+                  ),
+                  SizedBox(height: TSizes.spaceBtwSections,),
                 ],
               ),
+
             ),
             Padding(
               padding: const EdgeInsets.all(TSizes.defaultSpace),
