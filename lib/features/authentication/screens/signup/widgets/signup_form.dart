@@ -29,7 +29,7 @@ class TSignupForm extends StatelessWidget {
             children: [
               Expanded(
                 child: TextFormField(
-                  controller: controller.fistName,
+                  controller: controller.firstName,
                   expands: false,
                   decoration: const InputDecoration(
                       labelText: TTexts.firstName,
@@ -79,18 +79,27 @@ class TSignupForm extends StatelessWidget {
               labelText: TTexts.phoneNo,
               prefixIcon: Icon(Iconsax.call),
             ),
+            validator: (value) => TValidator.validatePhoneNumber(value),
           ),
+          const SizedBox(height: TSizes.spaceBtwInputFields),
 
-          const SizedBox(height: TSizes.spaceBtwInputFields),
-          TextFormField(
-            controller: controller.password,
-            obscureText: true,
-            decoration: const InputDecoration(
-                labelText: TTexts.password,
-                prefixIcon: Icon(Iconsax.password_check),
-                suffixIcon: Icon(Iconsax.eye_slash)),
+          Obx(
+              () => TextFormField(
+                controller: controller.password,
+                obscureText: controller.hidePassword.value,
+                decoration:  InputDecoration(
+                  labelText: TTexts.password,
+                  prefixIcon: Icon(Iconsax.password_check),
+                  suffixIcon: IconButton(
+                    icon: Icon(controller.hidePassword.value? Iconsax.eye_slash : Iconsax.eye),
+                    onPressed: () => controller.hidePassword.value = !controller.hidePassword.value,
+                  ),
+                ),
+                validator: (value) => TValidator.validatePassword(value),
+              ),
           ),
           const SizedBox(height: TSizes.spaceBtwInputFields),
+
           const TTermsAndConditionCheckbox(),
           const SizedBox(height: TSizes.spaceBtwSections),
           SizedBox(
