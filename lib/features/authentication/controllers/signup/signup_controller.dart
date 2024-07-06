@@ -49,10 +49,12 @@ class SignupController extends GetxController {
 
       /// privacy policy check
       if (!privacyPolicy.value) {
+        TFullScreenLoader.stopLoading();
         TLoaders.warningSnackBar(
             title: "Accept Privacy Policy",
             message:
                 "In order to create account, you must have to read and accept the privacy policy & terms of use");
+        return;
       }
 
       /// register
@@ -80,7 +82,7 @@ class SignupController extends GetxController {
       );
 
       TFullScreenLoader.stopLoading();
-      Get.to(() => const VerifyEmailScreen());
+      Get.to(() => VerifyEmailScreen(email: email.text.trim()));
 
     } catch (e) {
       TLoaders.errorSnackBar(title: "Oh Snap!", message: e.toString());
