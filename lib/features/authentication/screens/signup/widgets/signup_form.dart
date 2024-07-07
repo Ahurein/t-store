@@ -89,7 +89,7 @@ class TSignupForm extends StatelessWidget {
                 obscureText: controller.hidePassword.value,
                 decoration:  InputDecoration(
                   labelText: TTexts.password,
-                  prefixIcon: Icon(Iconsax.password_check),
+                  prefixIcon: const Icon(Iconsax.password_check),
                   suffixIcon: IconButton(
                     icon: Icon(controller.hidePassword.value? Iconsax.eye_slash : Iconsax.eye),
                     onPressed: () => controller.hidePassword.value = !controller.hidePassword.value,
