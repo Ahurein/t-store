@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:t_store/features/personalization/controllers/user_controller.dart';
 
 import '../../../../data/repositories/authentication/authentication_repository.dart';
 import '../../../../utils/constants/image_strings.dart';
@@ -10,6 +11,8 @@ import '../../../../utils/popups/loaders.dart';
 
 class LoginController extends GetxController {
   static LoginController get instance => Get.find();
+
+  final userController = Get.put(UserController());
 
   /// variables
   final rememberMe = false.obs;
@@ -74,6 +77,30 @@ class LoginController extends GetxController {
     } catch (e) {
       TLoaders.errorSnackBar(title: "Oh Snap!", message: e.toString());
       TFullScreenLoader.stopLoading();
+    }
+  }
+
+  Future<void> googleSignIn() async {
+    try{
+      TFullScreenLoader.openLoadingDialog(
+          "Logging you in...", TImages.docerAnimation);
+
+      /// check connectivity
+      final isConnected = await NetworkManager.instance.isConnected();
+      if (!isConnected){
+        TFullScreenLoader.stopLoading();
+        return;
+      }
+
+      final userCredential = await AuthenticationRepository.instance.signInWithGoogle();
+      await userController.saveUserRecord(userCredential);
+      TFullScreenLoader.stopLoading();
+
+      AuthenticationRepository.instance.screenRedirect();
+
+    }catch(e){
+      TFullScreenLoader.stopLoading();
+      TLoaders.errorSnackBar(title: "Oh Snap!", message: e.toString());
     }
   }
 
