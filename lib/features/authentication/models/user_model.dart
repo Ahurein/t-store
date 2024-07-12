@@ -36,7 +36,7 @@ class UserModel {
     return usernameWithPrefix;
   }
 
-  static UserModel empty() => UserModel(
+  factory UserModel.empty() => UserModel(
         id: '',
         firstName: '',
         lastName: '',
@@ -57,19 +57,20 @@ class UserModel {
     };
   }
 
-// factory UserModel.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> document) {
-//   if (document.data() != null) {
-//     final data = document.data()!;
-//     return UserModel(
-//       id: document.id,
-//       firstName: data['FirstName'] ?? '',
-//       lastName: data['LastName'] ?? '',
-//       username: data['Username'] ?? '',
-//       email: data['Email'] ?? '',
-//       phoneNumber: data['PhoneNumber'] ?? '',
-//       profilePicture: data['ProfilePicture'] ?? '',
-//     );
-//   }
-// }
-
+  factory UserModel.fromSnapshot(
+      DocumentSnapshot<Map<String, dynamic>> document) {
+    if (document.data() != null) {
+      final data = document.data()!;
+      return UserModel(
+        id: document.id,
+        firstName: data['FirstName'] ?? '',
+        lastName: data['LastName'] ?? '',
+        username: data['Username'] ?? '',
+        email: data['Email'] ?? '',
+        phoneNumber: data['PhoneNumber'] ?? '',
+        profilePicture: data['ProfilePicture'] ?? '',
+      );
+    }
+    return UserModel.empty();
+  }
 }
