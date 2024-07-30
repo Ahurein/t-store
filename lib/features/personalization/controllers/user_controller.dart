@@ -10,6 +10,7 @@ import 'package:t_store/features/authentication/screens/login/login.dart';
 import 'package:t_store/features/personalization/screens/profile/widgets/re_authenticate_user_login_form.dart';
 import 'package:t_store/utils/constants/image_strings.dart';
 import 'package:t_store/utils/constants/sizes.dart';
+import 'package:t_store/utils/helpers/network_manager.dart';
 import 'package:t_store/utils/popups/full_screen_loader.dart';
 import 'package:t_store/utils/popups/loaders.dart';
 
@@ -104,8 +105,28 @@ class UserController extends GetxController {
     }
   }
 
-  void reAuthenticateEmailAndPassword(){
+  void reAuthenticateEmailAndPassword() async {
+    try {
+      TFullScreenLoader.openLoadingDialog("Processing", TImages.docerAnimation);
+     final isConnected = await NetworkManager.instance.isConnected();
+     if(!isConnected){
+       TFullScreenLoader.stopLoading();
+       return;
+     }
 
+     if(!reAuthFormKey.currentState!.validate()){
+       TFullScreenLoader.stopLoading();
+       return;
+     }
+
+     await AuthenticationRepository.instance.reAuthenticateWithEmailAndPassword(verifyEmail.text.trim(), verifyPassword.text.trim());
+     await AuthenticationRepository.instance.deleteAccount();
+     TFullScreenLoader.stopLoading();
+     Get.offAll(() => const LoginScreen());
+    }catch (e){
+      TFullScreenLoader.stopLoading();
+      TLoaders.warningSnackBar(title: "Oh snap!", message: e.toString());
+    }
   }
 
 }
