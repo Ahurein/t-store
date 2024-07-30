@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:t_store/utils/formatters/formatter.dart';
 
 class UserModel {
-  final String id;
+  final String  id;
   String firstName;
   String lastName;
   final String username;

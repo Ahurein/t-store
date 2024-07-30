@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:t_store/common/widgets/appbar/appbar.dart';
 import 'package:t_store/common/widgets/image/t_circular_image.dart';
 import 'package:t_store/common/widgets/texts/section_heading.dart';
 import 'package:t_store/features/personalization/controllers/user_controller.dart';
+import 'package:t_store/features/personalization/screens/profile/widgets/change_name.dart';
 import 'package:t_store/features/personalization/screens/profile/widgets/profile_menu.dart';
 import 'package:t_store/utils/constants/image_strings.dart';
 import 'package:t_store/utils/constants/sizes.dart';
@@ -16,10 +18,11 @@ class ProfileScreen extends StatelessWidget {
     final controller = UserController.instance;
 
     return Scaffold(
-      appBar: TAppBar(
+      appBar: const TAppBar(
         title: Text("Profile"),
         showBackArrow: true,
       ),
+
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(TSizes.defaultSpace),
@@ -44,8 +47,8 @@ class ProfileScreen extends StatelessWidget {
               /// - Profile info
               TSectionHeading(title: "Profile Information", showActionButton: false),
               const SizedBox(height: TSizes.spaceBtwItems),
-              TProfileMenu(title: 'Name', value: controller.user.value.fullName,onPressed: (){}),
-              TProfileMenu(title: 'Username', value: controller.user.value.username,onPressed: (){}),
+              TProfileMenu(title: 'Name', value: controller.user.value.fullName, onPressed: () => Get.to(const ChangeNameWidget())),
+              TProfileMenu(title: 'Username', value: controller.user.value.username, onPressed: (){}),
               const SizedBox(height: TSizes.spaceBtwItems),
               const Divider(),
               const SizedBox(height: TSizes.spaceBtwItems),
