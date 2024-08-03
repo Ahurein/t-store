@@ -3,6 +3,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:t_store/data/repositories/authentication/authentication_repository.dart';
 import 'package:t_store/data/repositories/user/user_repository.dart';
 import 'package:t_store/features/authentication/models/user_model.dart';
@@ -26,7 +28,6 @@ class UserController extends GetxController {
   final verifyPassword = TextEditingController();
   GlobalKey<FormState> reAuthFormKey = GlobalKey<FormState>();
 
-
   @override
   void onInit() {
     super.onInit();
@@ -38,26 +39,30 @@ class UserController extends GetxController {
       profileLoading.value = true;
       final user = await userRepository.fetchUserDetails();
       this.user(user);
-    }catch (e) {
+    } catch (e) {
       user(UserModel.empty());
-    }finally {
+    } finally {
       profileLoading.value = false;
     }
   }
 
   Future<void> saveUserRecord(UserCredential? userCredential) async {
     try {
-      if(userCredential != null){
-        final nameParts = UserModel.nameParts(userCredential.user?.displayName ?? "");
-        final username = UserModel.generateUsername(userCredential.user?.displayName ?? "");
+      await fetchUserRecord();
+      if (user.value.id.isNotEmpty) return;
+      if (userCredential != null) {
+        final nameParts =
+            UserModel.nameParts(userCredential.user?.displayName ?? "");
+        final username =
+            UserModel.generateUsername(userCredential.user?.displayName ?? "");
 
         final user = UserModel(
           id: userCredential.user!.uid,
           firstName: nameParts[0],
-          lastName: nameParts.length > 1 ? nameParts.sublist(1).join(" "): "",
+          lastName: nameParts.length > 1 ? nameParts.sublist(1).join(" ") : "",
           email: userCredential.user?.email ?? "",
           phoneNumber: userCredential.user?.phoneNumber ?? "",
-          profilePicture: userCredential.user?.photoURL?? "",
+          profilePicture: userCredential.user?.photoURL ?? "",
           username: username,
         );
 
@@ -72,34 +77,40 @@ class UserController extends GetxController {
     }
   }
 
-  void deleteAccountWarningPopup(){
+  void deleteAccountWarningPopup() {
     Get.defaultDialog(
-      contentPadding: const EdgeInsets.all(TSizes.md),
-      title: 'Delete account',
-      middleText: 'Are you sure you want to delete your account permanently? This action is not reversible',
-      confirm: ElevatedButton(onPressed: () => deleteUserAccount(), child: const Padding(padding: EdgeInsets.symmetric(horizontal: TSizes.lg), child: Text("Delete"),)),
-      cancel: OutlinedButton(onPressed: () => Navigator.of(Get.overlayContext!).pop(), child: const Text("Delete"))
-    );
+        contentPadding: const EdgeInsets.all(TSizes.md),
+        title: 'Delete account',
+        middleText:
+            'Are you sure you want to delete your account permanently? This action is not reversible',
+        confirm: ElevatedButton(
+            onPressed: () => deleteUserAccount(),
+            child: const Padding(
+              padding: EdgeInsets.symmetric(horizontal: TSizes.lg),
+              child: Text("Delete"),
+            )),
+        cancel: OutlinedButton(
+            onPressed: () => Navigator.of(Get.overlayContext!).pop(),
+            child: const Text("Delete")));
   }
 
   Future<void> deleteUserAccount() async {
-    try{
+    try {
       TFullScreenLoader.openLoadingDialog("Processing", TImages.docerAnimation);
       final auth = AuthenticationRepository.instance;
       final providers = auth.authUser!.providerData.map((e) => e.providerId);
-      if(providers.isNotEmpty){
-        if(providers.contains("google.com")){
+      if (providers.isNotEmpty) {
+        if (providers.contains("google.com")) {
           await auth.signInWithGoogle();
           await auth.deleteAccount();
           TFullScreenLoader.stopLoading();
           Get.offAll(() => const LoginScreen());
-        }else if(providers.contains("password")){
+        } else if (providers.contains("password")) {
           TFullScreenLoader.stopLoading();
           Get.to(() => const ReAuthLoginForm());
-
         }
       }
-    }catch(e){
+    } catch (e) {
       TFullScreenLoader.stopLoading();
       TLoaders.warningSnackBar(title: "Oh snap!", message: e.toString());
     }
@@ -108,25 +119,46 @@ class UserController extends GetxController {
   void reAuthenticateEmailAndPassword() async {
     try {
       TFullScreenLoader.openLoadingDialog("Processing", TImages.docerAnimation);
-     final isConnected = await NetworkManager.instance.isConnected();
-     if(!isConnected){
-       TFullScreenLoader.stopLoading();
-       return;
-     }
+      final isConnected = await NetworkManager.instance.isConnected();
+      if (!isConnected) {
+        TFullScreenLoader.stopLoading();
+        return;
+      }
 
-     if(!reAuthFormKey.currentState!.validate()){
-       TFullScreenLoader.stopLoading();
-       return;
-     }
+      if (!reAuthFormKey.currentState!.validate()) {
+        TFullScreenLoader.stopLoading();
+        return;
+      }
 
-     await AuthenticationRepository.instance.reAuthenticateWithEmailAndPassword(verifyEmail.text.trim(), verifyPassword.text.trim());
-     await AuthenticationRepository.instance.deleteAccount();
-     TFullScreenLoader.stopLoading();
-     Get.offAll(() => const LoginScreen());
-    }catch (e){
+      await AuthenticationRepository.instance
+          .reAuthenticateWithEmailAndPassword(
+              verifyEmail.text.trim(), verifyPassword.text.trim());
+      await AuthenticationRepository.instance.deleteAccount();
+      TFullScreenLoader.stopLoading();
+      Get.offAll(() => const LoginScreen());
+    } catch (e) {
       TFullScreenLoader.stopLoading();
       TLoaders.warningSnackBar(title: "Oh snap!", message: e.toString());
     }
   }
 
+  void uploadUserProfilePicture() async {
+    try {
+      final image = await ImagePicker().pickImage(
+          source: ImageSource.gallery,
+          imageQuality: 70,
+          maxHeight: 512,
+          maxWidth: 512);
+
+      if (image != null) {
+        final imageUrl =
+            await userRepository.uploadImage("Users/Images/Profile", image);
+        Map<String, dynamic> json = {"ProfilePicture": imageUrl};
+        await userRepository.updateSingleField(json);
+        user.value.profilePicture = imageUrl;
+      }
+    } catch (e) {
+      TLoaders.errorSnackBar(title: "Oh snap", message: e.toString());
+    }
+  }
 }

@@ -33,8 +33,12 @@ class ProfileScreen extends StatelessWidget {
                   width: double.infinity,
                   child: Column(
                     children: [
-                      const TCircularImage(image: TImages.user, width: 80, height: 80,),
-                      TextButton(onPressed: (){}, child: const Text('Change Profile Picture'))
+                      Obx((){
+                        final networkImage = controller.user.value.profilePicture;
+                        final image = networkImage.isNotEmpty ? networkImage : TImages.user;
+                        return TCircularImage(image: image, width: 80, height: 80, isNetworkImage: networkImage.isNotEmpty,);
+                      }),
+                      TextButton(onPressed: () => controller.uploadUserProfilePicture(), child: const Text('Change Profile Picture'))
                     ],
                   ),
                 ),
@@ -66,7 +70,7 @@ class ProfileScreen extends StatelessWidget {
               const SizedBox(height: TSizes.spaceBtwItems),
               Center(
                 child: TextButton(
-                  onPressed: (){},
+                  onPressed: ()=> UserController.instance.deleteAccountWarningPopup(),
                   child: const Text("Close Account", style: TextStyle(color: Colors.red),),
                 ),
               )
