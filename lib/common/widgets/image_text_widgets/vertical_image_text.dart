@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:t_store/common/widgets/image/t_circular_image.dart';
 
 import '../../../utils/constants/colors.dart';
 import '../../../utils/constants/sizes.dart';
@@ -12,12 +13,14 @@ class TVerticalImageText extends StatelessWidget {
     this.textColor = TColors.white,
     this.backgroundColor,
     this.onTap,
+    this.isNetworkImage = true
   });
 
   final String title, image;
   final Color textColor;
   final Color? backgroundColor;
   final void Function()? onTap;
+  final bool isNetworkImage;
 
   @override
   Widget build(BuildContext context) {
@@ -29,34 +32,28 @@ class TVerticalImageText extends StatelessWidget {
         padding: const EdgeInsets.only(right: TSizes.spaceBtwItems),
         child: Column(
           children: [
-            Container(
-              width: 56,
-              height: 56,
-              padding: const EdgeInsets.all(TSizes.sm),
-              decoration: BoxDecoration(
-                color:
-                    backgroundColor ?? (isDark ? TColors.dark : TColors.white),
-                borderRadius: BorderRadius.circular(100),
-              ),
-              child: Center(
-                child: Image(
-                  image: AssetImage(image),
-                  color: (isDark ? TColors.white : TColors.dark),
-                  fit: BoxFit.cover,
-                ),
-              ),
+            TCircularImage(image: image,
+              fit: BoxFit.fitWidth,
+              padding: TSizes.sm * 1.4,
+              isNetworkImage: isNetworkImage,
+              backgroundColor: backgroundColor,
+              overlayColor: THelperFunctions.isDarkMode(context) ?  TColors.light : TColors.dark,
             ),
+
             const SizedBox(height: TSizes.spaceBtwItems / 2),
             SizedBox(
               width: 55,
-              child: Text(
-                title,
-                style: Theme.of(context)
-                    .textTheme
-                    .labelMedium!
-                    .apply(color: textColor),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              child: Center(
+                child: Text(
+                  title,
+                  style: Theme
+                      .of(context)
+                      .textTheme
+                      .labelMedium!
+                      .apply(color: textColor),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             )
           ],

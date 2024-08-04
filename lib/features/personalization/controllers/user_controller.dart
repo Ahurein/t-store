@@ -22,6 +22,7 @@ class UserController extends GetxController {
   final userRepository = Get.put(UserRepository());
   Rx<UserModel> user = UserModel.empty().obs;
   final profileLoading = false.obs;
+  final imageUploading = false.obs;
 
   final hidePassword = false.obs;
   final verifyEmail = TextEditingController();
@@ -91,7 +92,7 @@ class UserController extends GetxController {
             )),
         cancel: OutlinedButton(
             onPressed: () => Navigator.of(Get.overlayContext!).pop(),
-            child: const Text("Delete")));
+            child: const Text("Cancel")));
   }
 
   Future<void> deleteUserAccount() async {
@@ -151,14 +152,20 @@ class UserController extends GetxController {
           maxWidth: 512);
 
       if (image != null) {
+        imageUploading.value = true;
         final imageUrl =
             await userRepository.uploadImage("Users/Images/Profile", image);
         Map<String, dynamic> json = {"ProfilePicture": imageUrl};
         await userRepository.updateSingleField(json);
         user.value.profilePicture = imageUrl;
+        user.refresh();
+
+        TLoaders.successSnackBar(title: "Congratulations", message: "Your profile image has been updated!");
       }
     } catch (e) {
       TLoaders.errorSnackBar(title: "Oh snap", message: e.toString());
+    } finally {
+      imageUploading.value = false;
     }
   }
 }

@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:t_store/utils/formatters/formatter.dart';
 
+import 'address_model.dart';
+
 class UserModel {
   final String  id;
   String firstName;
@@ -9,6 +11,8 @@ class UserModel {
   final String email;
   String phoneNumber;
   String profilePicture;
+  List<AddressModel> address = [];
+
 
   UserModel({
     required this.id,
@@ -18,6 +22,7 @@ class UserModel {
     required this.email,
     required this.phoneNumber,
     required this.profilePicture,
+    this.address = const []
   });
 
   String get fullName => '$firstName $lastName';
