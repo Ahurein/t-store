@@ -17,10 +17,10 @@ import '../features/shop/screens/store/store.dart';
 
 class AppRoutes {
   static final pages = [
-    GetPage(name: TRoutes.home, page: () => const HomeScreen()),
+    GetPage(name: TRoutes.search, page: () => const HomeScreen(), fullscreenDialog: false),
     GetPage(name: TRoutes.store, page: () => const StoreScreen()),
     // GetPage(name: TRoutes.favourites, page: () => const FavouriteScreen()),
-    GetPage(name: TRoutes.settings, page: () => const SettingsScreen()),
+    GetPage(name: TRoutes.settings, page: () => const SettingsScreen(), fullscreenDialog: false),
     GetPage(name: TRoutes.productReviews, page: () => const ProductReviewsScreen()),
     // GetPage(name: TRoutes.order, page: () => const OrderScreen()),
     GetPage(name: TRoutes.checkout, page: () => const CheckoutScreen()),
